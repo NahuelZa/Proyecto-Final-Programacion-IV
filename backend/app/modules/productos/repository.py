@@ -47,3 +47,12 @@ class ProductoRepository(BaseRepository[Producto]):
         ).all()
 
         return list(productos), total
+
+    def get_by_id_for_update(self, producto_id: int) -> Producto | None:
+        """Carga el producto y BLOQUEA su fila hasta que termine la transacción."""
+        return self.session.exec(
+            select(Producto)
+            .where(Producto.id == producto_id, Producto.activo.is_(True))
+            .with_for_update()
+            .execution_options(populate_existing=True)  # relee aunque ya esté en la sesión
+        ).first()

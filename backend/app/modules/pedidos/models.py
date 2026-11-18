@@ -30,9 +30,12 @@ class Pedido(SQLModel, table=True):
 
     usuario: Optional["Usuario"] = Relationship(back_populates="pedidos")
     items: list["DetallePedido"] = Relationship(
-        back_populates="pedido",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
-    )
+            back_populates="pedido",
+            sa_relationship_kwargs={
+                "cascade": "all, delete-orphan",
+                "order_by": "DetallePedido.id",
+            },
+        )
 
 
 class DetallePedido(SQLModel, table=True):

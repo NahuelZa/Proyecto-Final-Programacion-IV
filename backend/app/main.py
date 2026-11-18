@@ -10,6 +10,7 @@ from app.modules.categorias.router import router as categorias_router
 from app.modules.auth.router import router as auth_router
 from app.modules.usuarios.router import router as usuarios_router
 from app.modules.productos.router import router as productos_router
+from app.modules.pedidos.router import router as pedidos_router
 
 
 
@@ -51,5 +52,6 @@ app.include_router(categorias_router, prefix=API_PREFIX)
 app.include_router(auth_router, prefix=API_PREFIX)
 app.include_router(usuarios_router, prefix=API_PREFIX)
 app.include_router(productos_router, prefix=API_PREFIX)
+app.include_router(pedidos_router, prefix=API_PREFIX)
 # Los routers se registran acá, con el prefijo /api/v1, a medida que existan:
 # app.include_router(auth_router, prefix=API_PREFIX)
