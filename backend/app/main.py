@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.database import create_all_tables
+from app import modules as _modules
 
 API_PREFIX = "/api/v1"
 

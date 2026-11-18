@@ -2,7 +2,7 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from app.core.config import settings
 
-# check_same_thread solo existe en SQLite.
+
 _connect_args = (
     {"check_same_thread": False} if settings.DATABASE_URL.startswith("sqlite") else {}
 )
@@ -19,5 +19,5 @@ def session_factory() -> Session:
 def create_all_tables() -> None:
     """Crea las tablas de todos los modelos registrados en SQLModel.metadata."""
     # Importar un módulo de modelos es lo que registra sus tablas.
-    # Se agregan acá, uno por uno, a medida que existan (Paso B2).
+    # Se agregan acá, uno por uno, a medida que existan
     SQLModel.metadata.create_all(engine)
