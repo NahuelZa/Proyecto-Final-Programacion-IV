@@ -84,7 +84,7 @@ class PedidoService:
 
     @staticmethod
     def _restituir_stock(uow: PedidoUnitOfWork, pedido: Pedido) -> None:
-        """RN-03: devuelve el stock de cada línea (en orden fijo, para evitar deadlocks)."""
+        """Devuelve el stock de los productos del pedido. Se llama solo al cancelar un pedido."""
         for detalle in sorted(pedido.items, key=lambda d: d.producto_id):
             producto = uow.productos.get_by_id_for_update(detalle.producto_id)
             if producto is not None:
@@ -106,7 +106,7 @@ class PedidoService:
     # ---- casos de uso
 
     def crear(self, data: PedidoCreate, usuario: UserPublic) -> PedidoRead:
-        """RN-01, RN-05, RN-06: todo ocurre en una sola transacción."""
+        """Todo ocurre en una sola transacción."""
         ids = [item.producto_id for item in data.items]
         if len(set(ids)) != len(ids):
             raise ProductoRepetido()
@@ -144,8 +144,8 @@ class PedidoService:
                         pedido_id=pedido.id,
                         producto_id=producto.id,
                         cantidad=item.cantidad,
-                        nombre_producto=producto.nombre,  # copia (RN-05)
-                        precio_unitario=producto.precio_base,  # copia (RN-05)
+                        nombre_producto=producto.nombre,  
+                        precio_unitario=producto.precio_base,  
                         subtotal=subtotal,
                     )
                 )
@@ -158,7 +158,7 @@ class PedidoService:
     def listar(
         self, usuario: UserPublic, *, estado: EstadoPedido | None, skip: int, limit: int
     ) -> PedidosPaginados:
-        """RN-04: el admin ve todos; el cliente, solo los suyos."""
+        """El admin ve todos; el cliente, solo los suyos."""
         estado_valor = estado.value if estado else None
         with self.uow as uow:
             if usuario.role == "admin":
@@ -179,14 +179,14 @@ class PedidoService:
             return PedidoRead.model_validate(pedido)
 
     def cambiar_estado(self, pedido_id: int, nuevo: EstadoPedido) -> PedidoRead:
-        """Solo admin (el Router lo exige). RN-02 y RN-03."""
+        """Solo admin (el Router lo exige)"""
         with self.uow as uow:
             pedido = self._get_pedido(uow, pedido_id, bloquear=True)
             pedido = self._aplicar_transicion(uow, pedido, nuevo)
             return PedidoRead.model_validate(pedido)
 
     def cancelar(self, pedido_id: int, usuario: UserPublic) -> PedidoRead:
-        """RN-03 y RN-04: el dueño cancela su pedido, solo desde PENDIENTE."""
+        """El dueño cancela su pedido, solo desde PENDIENTE."""
         with self.uow as uow:
             pedido = self._get_pedido(uow, pedido_id, bloquear=True)
             if pedido.usuario_id != usuario.id:
