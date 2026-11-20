@@ -1,27 +1,30 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import type { Rol } from "@/features/auth";
 import { useAuthStore } from "@/store/authStore";
 
-interface Props {
+interface ProtectedRouteProps {
   /** Si se omite, alcanza con tener sesión. */
   allowedRoles?: Rol[];
 }
 
-export function ProtectedRoute({ allowedRoles }: Props) {
+export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   const usuario = useAuthStore((s) => s.usuario);
   const cargando = useAuthStore((s) => s.cargando);
-  const location = useLocation();
 
   // Primero esperamos a checkSession: el usuario guardado en el navegador
   // podría estar vencido, y todavía no sabemos si la cookie sigue valiendo.
   if (cargando) {
-    return <p className="mt-16 text-center text-sm text-zinc-500">Verificando sesión…</p>;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-100">
+        <p className="text-sm text-zinc-500">Verificando sesión…</p>
+      </div>
+    );
   }
 
-  if (!usuario) {
-    // `from` permite volver acá después de loguearse.
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
-  }
+  // `replace` reemplaza la entrada del historial en vez de agregar otra. Sin
+  // esto, el botón "atrás" te devuelve a la ruta protegida, que te vuelve a
+  // redirigir, y quedás atrapado.
+  if (!usuario) return <Navigate to="/login" replace />;
 
   if (allowedRoles && !allowedRoles.includes(usuario.role)) {
     return <Navigate to="/unauthorized" replace />;
