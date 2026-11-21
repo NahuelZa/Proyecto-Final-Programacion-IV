@@ -1,3 +1,4 @@
+//IA 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -6,9 +7,6 @@ export interface ItemCarrito {
   nombre: string;
   precio_unitario: number;
   cantidad: number;
-  imagen_url: string | null;
-  /** Stock conocido al agregar: solo sirve para limitar los botones "+". */
-  stock: number;
 }
 
 interface CartState {
@@ -18,7 +16,6 @@ interface CartState {
   cambiarCantidad: (productoId: number, cantidad: number) => void;
   vaciar: () => void;
   total: () => number;
-  cantidadTotal: () => number;
 }
 
 export const useCartStore = create<CartState>()(
@@ -29,16 +26,15 @@ export const useCartStore = create<CartState>()(
       agregar: (producto) =>
         set((state) => {
           const existente = state.items.find((i) => i.producto_id === producto.producto_id);
-          if (!existente) {
-            return { items: [...state.items, { ...producto, cantidad: 1 }] };
+          if (existente) {
+            // Ya estaba en el carrito: sumamos una unidad.
+            return {
+              items: state.items.map((i) =>
+                i.producto_id === producto.producto_id ? { ...i, cantidad: i.cantidad + 1 } : i,
+              ),
+            };
           }
-          return {
-            items: state.items.map((i) =>
-              i.producto_id === producto.producto_id
-                ? { ...i, stock: producto.stock, cantidad: Math.min(i.cantidad + 1, producto.stock) }
-                : i,
-            ),
-          };
+          return { items: [...state.items, { ...producto, cantidad: 1 }] };
         }),
 
       quitar: (productoId) =>
@@ -46,24 +42,14 @@ export const useCartStore = create<CartState>()(
 
       cambiarCantidad: (productoId, cantidad) =>
         set((state) => ({
-          items: state.items.map((i) =>
-            i.producto_id === productoId
-              ? { ...i, cantidad: Math.max(1, Math.min(cantidad, i.stock)) }
-              : i,
-          ),
+          items: state.items.map((i) => (i.producto_id === productoId ? { ...i, cantidad } : i)),
         })),
 
       vaciar: () => set({ items: [] }),
 
-      // Se calculan a partir de `items`: un total guardado podría desincronizarse.
-      total: () =>
-        Math.round(get().items.reduce((suma, i) => suma + i.precio_unitario * i.cantidad, 0) * 100) / 100,
-
-      cantidadTotal: () => get().items.reduce((suma, i) => suma + i.cantidad, 0),
+      // El total se calcula a partir de los ítems: guardarlo podría dejarlo desincronizado.
+      total: () => get().items.reduce((suma, i) => suma + i.precio_unitario * i.cantidad, 0),
     }),
-    {
-      name: "cart-storage",
-      partialize: (state) => ({ items: state.items }), // solo los ítems; nunca datos de sesión
-    },
+    { name: "cart-storage" },
   ),
 );

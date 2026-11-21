@@ -3,6 +3,7 @@ import { LoginPage, RegisterPage, UnauthorizedPage } from "@/features/auth";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import { MainLayout } from "@/shared/layout/MainLayout";
 import { CatalogoPage } from "@/features/productos";
+import { CarritoPage } from "@/features/pedidos";
 
 // Marcador temporal: cada uno se reemplaza por su pantalla real en los próximos pasos.
 function EnConstruccion({ titulo }: { titulo: string }) {
@@ -16,7 +17,7 @@ export function AppRouter() {
         <Route element={<MainLayout />}>
           {/* Públicas */}
           <Route path="/" element={<CatalogoPage />} />
-          <Route path="/carrito" element={<EnConstruccion titulo="Carrito" />} />
+          <Route path="/carrito" element={<CarritoPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />

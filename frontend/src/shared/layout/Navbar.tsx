@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/features/auth";
+import { useCartStore } from "@/store/cartStore";
 
 const claseDeEnlace = ({ isActive }: { isActive: boolean }) =>
   `rounded-md px-3 py-1.5 text-sm font-medium ${
@@ -9,6 +10,7 @@ const claseDeEnlace = ({ isActive }: { isActive: boolean }) =>
 export function Navbar() {
   const { usuario, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
+  const cantidadCarrito = useCartStore((s) => s.items.reduce((suma, i) => suma + i.cantidad, 0));
 
   const cerrarSesion = async () => {
     await logout();
@@ -26,7 +28,7 @@ export function Navbar() {
             Catálogo
           </NavLink>
           <NavLink to="/carrito" className={claseDeEnlace}>
-            Carrito
+            Carrito{cantidadCarrito > 0 ? ` (${cantidadCarrito})` : ""}
           </NavLink>
           {usuario ? (
             <NavLink to="/mis-pedidos" className={claseDeEnlace}>

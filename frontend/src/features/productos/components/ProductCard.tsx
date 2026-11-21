@@ -1,6 +1,10 @@
 import type { Producto } from "@/features/productos/types/producto.types";
+import { Button } from "@/shared/ui/Button";
+import { useCartStore } from "@/store/cartStore";
 
 export function ProductoCard({ producto }: { producto: Producto }) {
+  const agregar = useCartStore((s) => s.agregar);
+
   const agotado = producto.stock <= 0;
   const disponible = producto.disponible && !agotado;
 
@@ -27,6 +31,20 @@ export function ProductoCard({ producto }: { producto: Producto }) {
         <p className={`text-xs font-medium ${disponible ? "text-green-700" : "text-red-700"}`}>
           {disponible ? "Disponible" : agotado ? "Agotado" : "No disponible"}
         </p>
+
+        <Button
+          className="mt-3 w-full"
+          disabled={!disponible}
+          onClick={() =>
+            agregar({
+              producto_id: producto.id,
+              nombre: producto.nombre,
+              precio_unitario: producto.precio_base,
+            })
+          }
+        >
+          Agregar al carrito
+        </Button>
       </div>
     </article>
   );

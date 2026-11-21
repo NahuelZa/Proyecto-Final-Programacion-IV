@@ -1,3 +1,4 @@
+export { CarritoPage } from "./pages/CarritoPage";
 export type {
   DetallePedido,
   EstadoPedido,
