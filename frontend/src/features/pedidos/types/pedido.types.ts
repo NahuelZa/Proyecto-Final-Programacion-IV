@@ -36,3 +36,14 @@ export interface ResumenPedidos {
   pedidos_hoy: number;
   ingresos_entregados: number;
 }
+export interface ItemPedidoPayload {
+  producto_id: number;
+  cantidad: number;
+}
+
+export interface PedidoCreatePayload {
+  items: ItemPedidoPayload[];
+  forma_pago: FormaPago;
+  direccion_entrega: string;
+  notas?: string;
+}

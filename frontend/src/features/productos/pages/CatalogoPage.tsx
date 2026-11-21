@@ -17,6 +17,7 @@ export function CatalogoPage() {
   const [texto, setTexto] = useState(""); // lo que se está escribiendo
   const [busqueda, setBusqueda] = useState(""); // lo que se buscó de verdad
   const [categoriaId, setCategoriaId] = useState<number | null>(null);
+ 
 
   const { categorias } = useCategorias();
   const { productos, total, isLoading, error, refetch } = useProductos({

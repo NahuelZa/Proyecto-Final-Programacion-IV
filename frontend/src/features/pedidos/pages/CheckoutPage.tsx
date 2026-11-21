@@ -4,10 +4,8 @@ import {
   type DatosCheckout,
   FormularioCheckout,
 } from "@/features/pedidos/components/FormularioCheckout";
-import { useCrearPedido } from "@/features/pedidos/hooks/crearPedido";
-import { handleApiError } from "@/shared/api/handleApiError";
+import { useCrearPedido } from "@/features/pedidos/hooks/useCrearPedido";
 import { Card } from "@/shared/ui/Card";
-import { formatearPrecio } from "@/shared/utils/formato";
 import { useCartStore } from "@/store/cartStore";
 
 export function CheckoutPage() {
@@ -15,40 +13,43 @@ export function CheckoutPage() {
   const total = useCartStore((s) => s.total());
   const vaciar = useCartStore((s) => s.vaciar);
   const navigate = useNavigate();
-  const { mutateAsync, error } = useCrearPedido();
-  // Evita que "carrito vacío → volver al carrito" se dispare justo después de confirmar.
+  const { crear, enviando, error } = useCrearPedido();
+  // Te faltaba esto por eso al confirmar (el carrito queda vacío) la propia página te sacaba
+  // hacia /carrito antes de llegar a "Mis pedidos".
   const [pedidoCreado, setPedidoCreado] = useState(false);
 
   if (items.length === 0 && !pedidoCreado) return <Navigate to="/carrito" replace />;
 
-  const confirmar = async (datos: DatosCheckout) => {
-    try {
-      await mutateAsync({
-        // Solo ids y cantidades: los precios los fija el servidor, nunca el cliente.
+  const confirmar = (datos: DatosCheckout) => {
+    crear(
+      {
+        // Solo ids y cantidades: los precios los fija el servidor, nunca el navegador.
         items: items.map((i) => ({ producto_id: i.producto_id, cantidad: i.cantidad })),
         forma_pago: datos.forma_pago,
         direccion_entrega: datos.direccion_entrega.trim(),
         notas: datos.notas.trim() || undefined,
-      });
-      setPedidoCreado(true);
-      vaciar();
-      navigate("/mis-pedidos");
-    } catch {
-      // El error queda en `error` de la mutación; el carrito se conserva.
-    }
+      },
+      {
+        onSuccess: () => {
+          setPedidoCreado(true);
+          vaciar();
+          navigate("/mis-pedidos");
+        },
+      },
+    );
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid gap-6 text-left lg:grid-cols-2">
       <div>
         <h1 className="text-2xl font-bold text-zinc-900">Confirmar pedido</h1>
         <Card className="mt-4">
           {error ? (
-            <p role="alert" className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
-              {handleApiError(error, "No se pudo crear el pedido")}
+            <p role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+              {error}
             </p>
           ) : null}
-          <FormularioCheckout onSubmit={confirmar} />
+          <FormularioCheckout enviando={enviando} onSubmit={confirmar} />
         </Card>
       </div>
 
@@ -62,14 +63,14 @@ export function CheckoutPage() {
                   {item.cantidad} × {item.nombre}
                 </span>
                 <span className="font-medium text-zinc-900">
-                  {formatearPrecio(item.precio_unitario * item.cantidad)}
+                  ${(item.precio_unitario * item.cantidad).toFixed(2)}
                 </span>
               </li>
             ))}
           </ul>
           <div className="mt-4 flex justify-between border-t border-zinc-200 pt-4">
             <span className="font-semibold text-zinc-900">Total estimado</span>
-            <span className="text-lg font-bold text-zinc-900">{formatearPrecio(total)}</span>
+            <span className="text-lg font-bold text-zinc-900">${total.toFixed(2)}</span>
           </div>
           <p className="mt-2 text-xs text-zinc-500">
             El total definitivo lo calcula el servidor con los precios vigentes.

@@ -4,6 +4,10 @@ import { useCartStore } from "@/store/cartStore";
 
 export function ProductoCard({ producto }: { producto: Producto }) {
   const agregar = useCartStore((s) => s.agregar);
+  const cantidadEnCarrito =
+    useCartStore((s) => s.items.find((i) => i.producto_id === producto.id)?.cantidad) ??
+    0;
+    const sinStockSuficiente = cantidadEnCarrito >= producto.stock;
 
   const agotado = producto.stock <= 0;
   const disponible = producto.disponible && !agotado;
@@ -34,7 +38,7 @@ export function ProductoCard({ producto }: { producto: Producto }) {
 
         <Button
           className="mt-3 w-full"
-          disabled={!disponible}
+          disabled={!disponible || sinStockSuficiente}
           onClick={() =>
             agregar({
               producto_id: producto.id,

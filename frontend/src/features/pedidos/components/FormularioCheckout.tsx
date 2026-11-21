@@ -1,10 +1,8 @@
 import { useForm } from "@tanstack/react-form";
 import type { FormaPago } from "@/features/pedidos/types/pedido.types";
 import { Button } from "@/shared/ui/Button";
-import { fieldError } from "@/shared/ui/fieldError";
+import { INPUT_MT_CLASS } from "@/shared/ui/fieldClasses";
 import { Input } from "@/shared/ui/Input";
-import { Select } from "@/shared/ui/Select";
-import { Textarea } from "@/shared/ui/Textarea";
 
 export interface DatosCheckout {
   direccion_entrega: string;
@@ -13,17 +11,18 @@ export interface DatosCheckout {
 }
 
 interface Props {
-  onSubmit: (datos: DatosCheckout) => Promise<void>;
+  enviando: boolean;
+  onSubmit: (datos: DatosCheckout) => void;
 }
 
-export function FormularioCheckout({ onSubmit }: Props) {
+export function FormularioCheckout({ enviando, onSubmit }: Props) {
   const form = useForm({
     defaultValues: {
       direccion_entrega: "",
       forma_pago: "EFECTIVO" as FormaPago,
       notas: "",
     },
-    onSubmit: async ({ value }) => onSubmit(value),
+    onSubmit: ({ value }) => onSubmit(value),
   });
 
   return (
@@ -31,7 +30,6 @@ export function FormularioCheckout({ onSubmit }: Props) {
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
-        e.stopPropagation();
         void form.handleSubmit();
       }}
       className="space-y-4"
@@ -40,9 +38,9 @@ export function FormularioCheckout({ onSubmit }: Props) {
         name="direccion_entrega"
         validators={{
           onChange: ({ value }) => {
-            const v = value.trim();
-            if (v.length < 5) return "La dirección debe tener al menos 5 caracteres";
-            if (v.length > 200) return "La dirección no puede superar los 200 caracteres";
+            const largo = value.trim().length;
+            if (largo < 5) return "Mínimo 5 caracteres";
+            if (largo > 200) return "Máximo 200 caracteres";
             return undefined;
           },
         }}
@@ -52,52 +50,57 @@ export function FormularioCheckout({ onSubmit }: Props) {
             label="Dirección de entrega"
             autoComplete="street-address"
             value={field.state.value}
-            onBlur={field.handleBlur}
             onChange={(e) => field.handleChange(e.target.value)}
-            error={fieldError(field.state.meta)}
+            onBlur={field.handleBlur}
+            error={field.state.meta.errors.join(", ")}
           />
         )}
       </form.Field>
 
       <form.Field name="forma_pago">
         {(field) => (
-          <Select
-            label="Forma de pago"
-            value={field.state.value}
-            onChange={(e) => field.handleChange(e.target.value as FormaPago)}
-          >
-            <option value="EFECTIVO">Efectivo</option>
-            <option value="TRANSFERENCIA">Transferencia</option>
-          </Select>
+          <label className="block text-left text-sm font-medium text-zinc-700">
+            Forma de pago
+            <select
+              className={INPUT_MT_CLASS}
+              value={field.state.value}
+              onChange={(e) => field.handleChange(e.target.value as FormaPago)}
+            >
+              <option value="EFECTIVO">Efectivo</option>
+              <option value="TRANSFERENCIA">Transferencia</option>
+            </select>
+          </label>
         )}
       </form.Field>
 
       <form.Field
         name="notas"
         validators={{
-          onChange: ({ value }) =>
-            value.length > 500 ? "Las notas no pueden superar los 500 caracteres" : undefined,
+          onChange: ({ value }) => (value.length > 500 ? "Máximo 500 caracteres" : undefined),
         }}
       >
         {(field) => (
-          <Textarea
-            label="Notas (opcional)"
-            rows={3}
-            value={field.state.value}
-            onBlur={field.handleBlur}
-            onChange={(e) => field.handleChange(e.target.value)}
-            error={fieldError(field.state.meta)}
-          />
+          <label className="block text-left text-sm font-medium text-zinc-700">
+            Notas (opcional)
+            <textarea
+              rows={3}
+              className={INPUT_MT_CLASS}
+              value={field.state.value}
+              onChange={(e) => field.handleChange(e.target.value)}
+              onBlur={field.handleBlur}
+            />
+            {field.state.meta.errors.length > 0 ? (
+              <span className="mt-1 block text-xs font-normal text-red-600">
+                {field.state.meta.errors.join(", ")}
+              </span>
+            ) : null}
+          </label>
         )}
       </form.Field>
 
-      <form.Subscribe selector={(state) => state.isSubmitting}>
-        {(isSubmitting) => (
-          <Button type="submit" loading={isSubmitting} className="w-full">
-            Confirmar pedido
-          </Button>
-        )}
-      </form.Subscribe>
+      <Button type="submit" disabled={enviando} className="w-full">
+        {enviando ? "Confirmando…" : "Confirmar pedido"}
+      </Button>
     </form>
   );
 }
