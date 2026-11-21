@@ -1,5 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { LoginPage, UnauthorizedPage } from "@/features/auth";
+import { LoginPage, RegisterPage, UnauthorizedPage } from "@/features/auth";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import { MainLayout } from "@/shared/layout/MainLayout";
 
@@ -17,7 +17,7 @@ export function AppRouter() {
           <Route path="/" element={<EnConstruccion titulo="Catálogo" />} />
           <Route path="/carrito" element={<EnConstruccion titulo="Carrito" />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<EnConstruccion titulo="Registro" />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
           {/* Requieren sesión */}

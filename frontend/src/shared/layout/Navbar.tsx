@@ -1,14 +1,13 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/store/authStore";
+import { useAuth } from "@/features/auth";
 
 const claseDeEnlace = ({ isActive }: { isActive: boolean }) =>
   `rounded-md px-3 py-1.5 text-sm font-medium ${
-    isActive ? "bg-orange-100 text-orange-700" : "text-zinc-600 hover:bg-zinc-100"
+    isActive ? "bg-violet-100 text-violet-700" : "text-zinc-600 hover:bg-zinc-100"
   }`;
 
 export function Navbar() {
-  const usuario = useAuthStore((s) => s.usuario);
-  const logout = useAuthStore((s) => s.logout);
+  const { usuario, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
 
   const cerrarSesion = async () => {
@@ -20,17 +19,25 @@ export function Navbar() {
     <header className="border-b border-zinc-200 bg-white">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div className="flex flex-wrap items-center gap-1">
-          <Link to="/" className="mr-3 text-lg font-bold text-orange-600">
+          <Link to="/" className="mr-3 text-lg font-bold text-violet-600">
             Food Store
           </Link>
-          <NavLink to="/" end className={claseDeEnlace}>Catálogo</NavLink>
-          <NavLink to="/carrito" className={claseDeEnlace}>Carrito</NavLink>
+          <NavLink to="/" end className={claseDeEnlace}>
+            Catálogo
+          </NavLink>
+          <NavLink to="/carrito" className={claseDeEnlace}>
+            Carrito
+          </NavLink>
           {usuario ? (
-            <NavLink to="/mis-pedidos" className={claseDeEnlace}>Mis pedidos</NavLink>
+            <NavLink to="/mis-pedidos" className={claseDeEnlace}>
+              Mis pedidos
+            </NavLink>
           ) : null}
           {/* Mostrar el panel solo a admin es comodidad; el backend lo exige igual. */}
-          {usuario?.role === "admin" ? (
-            <NavLink to="/admin/resumen" className={claseDeEnlace}>Panel admin</NavLink>
+          {isAdmin ? (
+            <NavLink to="/admin/resumen" className={claseDeEnlace}>
+              Panel admin
+            </NavLink>
           ) : null}
         </div>
 
@@ -39,7 +46,7 @@ export function Navbar() {
             <>
               <span className="text-zinc-600">
                 {usuario.full_name} ·{" "}
-                <span className="font-medium text-orange-700">{usuario.role}</span>
+                <span className="font-medium text-violet-700">{usuario.role}</span>
               </span>
               <button
                 type="button"
@@ -51,8 +58,12 @@ export function Navbar() {
             </>
           ) : (
             <>
-              <NavLink to="/login" className={claseDeEnlace}>Ingresar</NavLink>
-              <NavLink to="/register" className={claseDeEnlace}>Registrarse</NavLink>
+              <NavLink to="/login" className={claseDeEnlace}>
+                Ingresar
+              </NavLink>
+              <NavLink to="/register" className={claseDeEnlace}>
+                Registrarse
+              </NavLink>
             </>
           )}
         </div>

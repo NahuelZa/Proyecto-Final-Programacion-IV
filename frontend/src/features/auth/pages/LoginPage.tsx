@@ -1,41 +1,37 @@
-import { type FormEvent, useState } from "react";
-import { Link, Navigate, useLocation } from "react-router-dom";
-import { handleApiError } from "@/shared/api/handleApiError";
-import { useAuthStore } from "@/store/authStore";
-import { useLogin } from "../hooks/useLogin";
 import { useForm } from "@tanstack/react-form";
+import { Link, Navigate } from "react-router-dom";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { Button } from "@/shared/ui/Button";
+import { Card } from "@/shared/ui/Card";
+import { Input } from "@/shared/ui/Input";
 
 export function LoginPage() {
-  const usuario = useAuthStore((s) => s.usuario);
-  const location = useLocation();
-  const { mutateAsync, error } = useLogin();
+  const { usuario, enviando, error, login, setError } = useAuth();
 
-const form = useForm({
+  const form = useForm({
     defaultValues: { username: "", password: "" },
     onSubmit: async ({ value }) => {
+      setError(null);
       try {
-        await mutateAsync(value);
+        await login(value.username, value.password);
       } catch {
-        // El error queda en `error` de la mutación y se muestra abajo.
+        /* el mensaje queda en el store */
       }
     },
   });
-  
-    if (usuario) {
-  return usuario.role === "admin" ? (
-    <Navigate to="/admin/resumen" replace />
-  ) : (
-    <Navigate to="/" replace />
-  );
-}
+
+  // Si ya hay sesión, no tiene sentido ver el login.
+  if (usuario) {
+    return <Navigate to={usuario.role === "admin" ? "/admin/resumen" : "/"} replace />;
+  }
 
   return (
     <Card className="mx-auto mt-8 max-w-sm">
       <h1 className="text-center text-xl font-semibold text-zinc-900">Iniciar sesión</h1>
 
       {error ? (
-        <p role="alert" className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
-          {handleApiError(error, "No se pudo iniciar sesión")}
+        <p role="alert" className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          {error}
         </p>
       ) : null}
 
@@ -43,7 +39,6 @@ const form = useForm({
         noValidate
         onSubmit={(e) => {
           e.preventDefault();
-          e.stopPropagation();
           void form.handleSubmit();
         }}
         className="mt-4 space-y-3"
@@ -59,9 +54,9 @@ const form = useForm({
               label="Usuario"
               autoComplete="username"
               value={field.state.value}
-              onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
-              error={fieldError(field.state.meta)}
+              onBlur={field.handleBlur}
+              error={field.state.meta.errors.join(", ")}
             />
           )}
         </form.Field>
@@ -69,7 +64,10 @@ const form = useForm({
         <form.Field
           name="password"
           validators={{
-            onChange: ({ value }) => (value ? undefined : "La contraseña es obligatoria"),
+            onChange: ({ value }) => {
+              if (!value|| !value.trim()) return "La contraseña es obligatoria";
+              if (value.length <= 8) return "Debe tener más de 8 caracteres";
+            }
           }}
         >
           {(field) => (
@@ -78,25 +76,25 @@ const form = useForm({
               type="password"
               autoComplete="current-password"
               value={field.state.value}
-              onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
-              error={fieldError(field.state.meta)}
+              onBlur={field.handleBlur}
+              error={field.state.meta.errors.join(", ")}
             />
           )}
         </form.Field>
 
-        <form.Subscribe selector={(state) => state.isSubmitting}>
-          {(isSubmitting) => (
-            <Button type="submit" loading={isSubmitting} className="w-full">
-              Entrar
-            </Button>
-          )}
-        </form.Subscribe>
+        <Button type="submit" disabled={enviando} className="w-full">
+          {enviando ? "Entrando…" : "Entrar"}
+        </Button>
       </form>
 
       <p className="mt-4 text-center text-sm text-zinc-600">
         ¿No tenés cuenta?{" "}
-        <Link to="/register" className="font-medium text-orange-700 hover:underline">
+        <Link
+          to="/register"
+          onClick={() => setError(null)}
+          className="font-medium text-violet-700 hover:underline"
+        >
           Registrate
         </Link>
       </p>
