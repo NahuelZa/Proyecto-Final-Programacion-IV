@@ -1,7 +1,7 @@
+import { api } from "@/shared/api/axiosInstance";
 import type { Categoria } from "@/features/categorias/types/categoria.types";
-import { axiosInstance } from "@/shared/api/axiosInstance";
 
 export async function listarCategorias(): Promise<Categoria[]> {
-  const { data } = await axiosInstance.get<Categoria[]>("/categorias");
+  const { data } = await api.get<Categoria[]>("/categorias");
   return data;
 }

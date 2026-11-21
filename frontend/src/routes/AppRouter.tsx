@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { LoginPage, RegisterPage, UnauthorizedPage } from "@/features/auth";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import { MainLayout } from "@/shared/layout/MainLayout";
+import { CatalogoPage } from "@/features/productos";
 
 // Marcador temporal: cada uno se reemplaza por su pantalla real en los próximos pasos.
 function EnConstruccion({ titulo }: { titulo: string }) {
@@ -14,7 +15,7 @@ export function AppRouter() {
       <Routes>
         <Route element={<MainLayout />}>
           {/* Públicas */}
-          <Route path="/" element={<EnConstruccion titulo="Catálogo" />} />
+          <Route path="/" element={<CatalogoPage />} />
           <Route path="/carrito" element={<EnConstruccion titulo="Carrito" />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />

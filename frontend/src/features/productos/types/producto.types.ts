@@ -17,11 +17,3 @@ export interface ProductosPaginados {
   total: number;
   items: Producto[];
 }
-
-export interface FiltrosProductos {
-  /** Página actual, empezando en 1. */
-  pagina: number;
-  limite: number;
-  search?: string;
-  categoriaId?: number | null;
-}
