@@ -3,7 +3,8 @@ import { LoginPage, RegisterPage, UnauthorizedPage } from "@/features/auth";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import { MainLayout } from "@/shared/layout/MainLayout";
 import { CatalogoPage } from "@/features/productos";
-import { CarritoPage, CheckoutPage } from "@/features/pedidos";
+import { AdminResumenPage, CarritoPage, CheckoutPage, MisPedidosPage } from "@/features/pedidos";
+import { AdminLayout } from "@/shared/layout/AdminLayout";
 
 // Marcador temporal: cada uno se reemplaza por su pantalla real en los próximos pasos.
 function EnConstruccion({ titulo }: { titulo: string }) {
@@ -25,16 +26,18 @@ export function AppRouter() {
           {/* Requieren sesión */}
           <Route element={<ProtectedRoute />}>
             <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/mis-pedidos" element={<EnConstruccion titulo="Mis pedidos" />} />
+            <Route path="/mis-pedidos" element={<MisPedidosPage />} />
           </Route>
 
           {/* Solo admin */}
           <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-            <Route path="/admin/resumen" element={<EnConstruccion titulo="Resumen" />} />
+          <Route element={<AdminLayout />}>
+             <Route path="/admin/resumen" element={<AdminResumenPage />} />
             <Route path="/admin/categorias" element={<EnConstruccion titulo="Categorías" />} />
             <Route path="/admin/productos" element={<EnConstruccion titulo="Productos" />} />
             <Route path="/admin/pedidos" element={<EnConstruccion titulo="Pedidos" />} />
             <Route path="/admin/usuarios" element={<EnConstruccion titulo="Usuarios" />} />
+          </Route>
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

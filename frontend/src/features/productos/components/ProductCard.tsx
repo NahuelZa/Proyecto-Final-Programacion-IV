@@ -4,11 +4,9 @@ import { useCartStore } from "@/store/cartStore";
 
 export function ProductoCard({ producto }: { producto: Producto }) {
   const agregar = useCartStore((s) => s.agregar);
-  const cantidadEnCarrito =
-    useCartStore((s) => s.items.find((i) => i.producto_id === producto.id)?.cantidad) ??
-    0;
-    const sinStockSuficiente = cantidadEnCarrito >= producto.stock;
-
+  const cantidadEnCarrito =useCartStore((s) => s.items.find((i) => i.producto_id === producto.id)?.cantidad) ?? 0;
+  
+  const sinStockSuficiente = cantidadEnCarrito >= producto.stock;
   const agotado = producto.stock <= 0;
   const disponible = producto.disponible && !agotado;
 

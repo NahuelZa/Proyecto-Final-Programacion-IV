@@ -1,16 +1,22 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { cancelarPedido } from "@/features/pedidos/api/pedidos";
+import * as pedidosApi from "@/features/pedidos/api/pedidos";
 
 export function useCancelarPedido() {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: cancelarPedido,
-    onSuccess: async () => {
-      // Cancelar restituye el stock: se refresca también el catálogo.
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["pedidos"] }),
-        queryClient.invalidateQueries({ queryKey: ["productos"] }),
-      ]);
+
+  const mutation = useMutation({
+    mutationFn: pedidosApi.cancelarPedido,
+    onSuccess: () => {
+      // Cancelar restituye el stock en el servidor: se refrescan pedidos y catálogo.
+      void queryClient.invalidateQueries({ queryKey: ["pedidos"] });
+      void queryClient.invalidateQueries({ queryKey: ["productos"] });
     },
   });
+
+  return {
+    cancelar: mutation.mutate,
+    cancelando: mutation.isPending,
+    error: mutation.error?.message ?? null,
+    reset: mutation.reset, // borra el error de un intento anterior
+  };
 }
