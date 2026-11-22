@@ -5,6 +5,7 @@ import { MainLayout } from "@/shared/layout/MainLayout";
 import { CatalogoPage } from "@/features/productos";
 import { AdminResumenPage, CarritoPage, CheckoutPage, MisPedidosPage } from "@/features/pedidos";
 import { AdminLayout } from "@/shared/layout/AdminLayout";
+import { AdminCategoriasPage } from "@/features/categorias";
 
 // Marcador temporal: cada uno se reemplaza por su pantalla real en los próximos pasos.
 function EnConstruccion({ titulo }: { titulo: string }) {
@@ -32,8 +33,8 @@ export function AppRouter() {
           {/* Solo admin */}
           <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
           <Route element={<AdminLayout />}>
-             <Route path="/admin/resumen" element={<AdminResumenPage />} />
-            <Route path="/admin/categorias" element={<EnConstruccion titulo="Categorías" />} />
+            <Route path="/admin/resumen" element={<AdminResumenPage />} />
+            <Route path="/admin/categorias" element={<AdminCategoriasPage />} />
             <Route path="/admin/productos" element={<EnConstruccion titulo="Productos" />} />
             <Route path="/admin/pedidos" element={<EnConstruccion titulo="Pedidos" />} />
             <Route path="/admin/usuarios" element={<EnConstruccion titulo="Usuarios" />} />
