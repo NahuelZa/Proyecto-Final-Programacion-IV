@@ -107,7 +107,7 @@ export function RegisterPage() {
           validators={{
             onChange: ({ value }) => {
               if (!value|| !value.trim()) return "La contraseña es obligatoria";
-              if (value.length <= 8) return "Debe tener más de 8 caracteres";
+              if (value.length <= 7) return "Debe tener más de 8 caracteres";
             }
           }}
         >
