@@ -11,7 +11,7 @@ interface Props {
 
 export function Paginacion({ pagina, total, porPagina, onCambiar }: Props) {
   const totalPaginas = Math.max(1, Math.ceil(total / porPagina));
-  if (totalPaginas <= 1) return null; // todo entra en una sola página
+  if (totalPaginas <= 1) return null; 
 
   return (
     <nav className="mt-6 flex items-center justify-center gap-4" aria-label="Paginación">

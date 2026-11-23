@@ -12,11 +12,8 @@ import {
   CheckoutPage,
   MisPedidosPage,
 } from "@/features/pedidos";
+import { AdminUsuariosPage } from "@/features/usuarios";
 
-// Marcador temporal: cada uno se reemplaza por su pantalla real en los próximos pasos.
-function EnConstruccion({ titulo }: { titulo: string }) {
-  return <h1 className="mt-8 text-center text-xl text-zinc-500">{titulo} (en construcción)</h1>;
-}
 
 export function AppRouter() {
   return (
@@ -43,7 +40,7 @@ export function AppRouter() {
             <Route path="/admin/categorias" element={<AdminCategoriasPage />} />
             <Route path="/admin/productos" element={<AdminProductosPage />} />
             <Route path="/admin/pedidos" element={<AdminPedidosPage />} />
-            <Route path="/admin/usuarios" element={<EnConstruccion titulo="Usuarios" />} />
+            <Route path="/admin/usuarios" element={<AdminUsuariosPage />} />
           </Route>
           </Route>
 
