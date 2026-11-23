@@ -2,7 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { LoginPage, RegisterPage, UnauthorizedPage } from "@/features/auth";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import { MainLayout } from "@/shared/layout/MainLayout";
-import { CatalogoPage } from "@/features/productos";
+import { AdminProductosPage, CatalogoPage } from "@/features/productos";
 import { AdminResumenPage, CarritoPage, CheckoutPage, MisPedidosPage } from "@/features/pedidos";
 import { AdminLayout } from "@/shared/layout/AdminLayout";
 import { AdminCategoriasPage } from "@/features/categorias";
@@ -35,7 +35,7 @@ export function AppRouter() {
           <Route element={<AdminLayout />}>
             <Route path="/admin/resumen" element={<AdminResumenPage />} />
             <Route path="/admin/categorias" element={<AdminCategoriasPage />} />
-            <Route path="/admin/productos" element={<EnConstruccion titulo="Productos" />} />
+            <Route path="/admin/productos" element={<AdminProductosPage />} />
             <Route path="/admin/pedidos" element={<EnConstruccion titulo="Pedidos" />} />
             <Route path="/admin/usuarios" element={<EnConstruccion titulo="Usuarios" />} />
           </Route>

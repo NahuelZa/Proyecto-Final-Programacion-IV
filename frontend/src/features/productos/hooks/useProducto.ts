@@ -1,9 +1,12 @@
-// Ayuda con IA
-import { useQuery } from "@tanstack/react-query";
-import { listarProductos } from "@/features/productos/api/producto";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as productosApi from "@/features/productos/api/producto";
+import type {
+  ProductoCreatePayload,
+  ProductoUpdatePayload,
+  StockPayload,
+} from "@/features/productos/types/producto.types";
 
 interface Filtros {
-  /** Página actual, empezando en 1. */
   pagina: number;
   limite: number;
   search: string;
@@ -11,17 +14,44 @@ interface Filtros {
 }
 
 export function useProductos({ pagina, limite, search, categoriaId }: Filtros) {
+  const queryClient = useQueryClient();
+
   const query = useQuery({
-    // La clave describe QUÉ se pidió: cada combinación de filtros se guarda aparte.
+    // useQuery con combinacion de filtros
     queryKey: ["productos", { pagina, limite, search, categoriaId }],
     queryFn: () =>
-      listarProductos({
-        // La API pagina con skip/limit: la página 3 de a 12 empieza saltando 24.
+      productosApi.listarProductos({
         skip: (pagina - 1) * limite,
         limit: limite,
         search: search || undefined,
         categoria_id: categoriaId ?? undefined,
       }),
+  });
+
+  // Todas las listas de productos (catálogo y panel) empiezan con "productos":
+  // invalidar ese prefijo las deja a todas como "viejas".
+  const refrescar = () => queryClient.invalidateQueries({ queryKey: ["productos"] });
+
+  const crear = useMutation({
+    mutationFn: (payload: ProductoCreatePayload) => productosApi.crearProducto(payload),
+    onSuccess: refrescar,
+  });
+
+  const actualizar = useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: ProductoUpdatePayload }) =>
+      productosApi.actualizarProducto(id, payload),
+    onSuccess: refrescar,
+  });
+
+  const inventario = useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: StockPayload }) =>
+      productosApi.cambiarStock(id, payload),
+    onSuccess: refrescar,
+  });
+
+  const eliminar = useMutation({
+    mutationFn: (id: number) => productosApi.eliminarProducto(id),
+    onSuccess: refrescar,
   });
 
   return {
@@ -30,5 +60,18 @@ export function useProductos({ pagina, limite, search, categoriaId }: Filtros) {
     isLoading: query.isPending,
     error: query.error?.message ?? null,
     refetch: query.refetch,
+    crear: crear.mutate,
+    actualizar: actualizar.mutate,
+    cambiarStock: inventario.mutate,
+    eliminar: eliminar.mutate,
+    guardando: crear.isPending || actualizar.isPending || inventario.isPending,   
+    errorGuardar: crear.error?.message ?? actualizar.error?.message ?? inventario.error?.message  ?? null,    
+    errorEliminar: eliminar.error?.message ?? null,
+    limpiarErrores: () => {
+      crear.reset();
+      actualizar.reset();
+      inventario.reset();
+      eliminar.reset();
+    },
   };
 }

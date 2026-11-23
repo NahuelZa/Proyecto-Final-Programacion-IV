@@ -17,3 +17,21 @@ export interface ProductosPaginados {
   total: number;
   items: Producto[];
 }
+
+export interface ProductoUpdatePayload {
+  nombre: string;
+  descripcion: string | null;
+  precio_base: number;
+  imagen_url: string | null;
+  categoria_id: number;
+}
+
+export interface ProductoCreatePayload extends ProductoUpdatePayload {
+  stock: number;
+  disponible: boolean;
+}
+
+export interface StockPayload {
+  stock: number;
+  disponible: boolean;
+}
