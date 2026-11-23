@@ -1,14 +1,17 @@
 import { api } from "@/shared/api/axiosInstance";
 import type {
+  EstadoPedido,
   Pedido,
   PedidoCreatePayload,
   PedidosPaginados,
   ResumenPedidos,
 } from "@/features/pedidos/types/pedido.types";
 
+
 export interface ParametrosPedidos {
   skip: number;
   limit: number;
+  estado?: EstadoPedido;
 }
 
 export async function crearPedido(payload: PedidoCreatePayload): Promise<Pedido> {
@@ -28,5 +31,10 @@ export async function cancelarPedido(pedidoId: number): Promise<Pedido> {
 
 export async function obtenerResumen(): Promise<ResumenPedidos> {
   const { data } = await api.get<ResumenPedidos>("/pedidos/resumen");
+  return data;
+}
+
+export async function cambiarEstado(pedidoId: number, estado: EstadoPedido): Promise<Pedido> {
+  const { data } = await api.patch<Pedido>(`/pedidos/${pedidoId}/estado`, { estado });
   return data;
 }

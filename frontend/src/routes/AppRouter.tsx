@@ -3,9 +3,15 @@ import { LoginPage, RegisterPage, UnauthorizedPage } from "@/features/auth";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 import { MainLayout } from "@/shared/layout/MainLayout";
 import { AdminProductosPage, CatalogoPage } from "@/features/productos";
-import { AdminResumenPage, CarritoPage, CheckoutPage, MisPedidosPage } from "@/features/pedidos";
 import { AdminLayout } from "@/shared/layout/AdminLayout";
 import { AdminCategoriasPage } from "@/features/categorias";
+import {
+  AdminPedidosPage,
+  AdminResumenPage,
+  CarritoPage,
+  CheckoutPage,
+  MisPedidosPage,
+} from "@/features/pedidos";
 
 // Marcador temporal: cada uno se reemplaza por su pantalla real en los próximos pasos.
 function EnConstruccion({ titulo }: { titulo: string }) {
@@ -36,7 +42,7 @@ export function AppRouter() {
             <Route path="/admin/resumen" element={<AdminResumenPage />} />
             <Route path="/admin/categorias" element={<AdminCategoriasPage />} />
             <Route path="/admin/productos" element={<AdminProductosPage />} />
-            <Route path="/admin/pedidos" element={<EnConstruccion titulo="Pedidos" />} />
+            <Route path="/admin/pedidos" element={<AdminPedidosPage />} />
             <Route path="/admin/usuarios" element={<EnConstruccion titulo="Usuarios" />} />
           </Route>
           </Route>
