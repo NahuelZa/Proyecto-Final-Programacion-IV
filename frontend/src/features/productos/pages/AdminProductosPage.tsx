@@ -30,6 +30,9 @@ export function AdminProductosPage() {
   const [editando, setEditando] = useState<Producto | null>(null);
   const [stockDe, setStockDe] = useState<Producto | null>(null);
 
+
+
+
   const abrirNuevo = () => {
     limpiarErrores();
     setEditando(null);
@@ -45,11 +48,13 @@ export function AdminProductosPage() {
   const cerrarModal = () => {
     setModalAbierto(false);
     setEditando(null);
+    setStockDe(null)
   };
 
   const abrirStock = (producto: Producto) => {
     limpiarErrores();
     setStockDe(producto);
+    
   };
 
   const eliminarProducto = (id: number) => {
@@ -57,6 +62,7 @@ export function AdminProductosPage() {
     limpiarErrores();
     eliminar(id);
   };
+  
 
   return (
     <div>
@@ -87,14 +93,15 @@ export function AdminProductosPage() {
           />
         )}
       </div>
-
-      {modalAbierto ? (
+          
+        
+      {modalAbierto || stockDe ? (
         <ProductoModal
           key={editando?.id ?? "nuevo"}
-          crearProducto={Boolean(!editando)}
-          editarProducto={Boolean(editando)}
           editarStock={Boolean(stockDe)}
-          producto={editando}
+          editarProducto={Boolean(editando)}
+          crearProducto={Boolean(!stockDe) && Boolean(!editando)}                    
+          producto={editando?.id ? editando : stockDe}
           categorias={categorias}
           guardando={guardando}
           error={errorGuardar}
